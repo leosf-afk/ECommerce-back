@@ -32,9 +32,12 @@ router.get('/', function(req, res){
     'p.precio',
     'p.imagen',
     'p.id'
+    // 'p.esta_eliminado'
 ])
 .slice(startValue, endValue)
 .sort({id: .1})
+//filter if the product exist
+.filter({'p.esta_eliminado' : 0 } )
 .getAll()
 .then(prods =>{
     if(prods.length > 0){
