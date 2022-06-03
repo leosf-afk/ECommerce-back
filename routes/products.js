@@ -6,7 +6,7 @@ const {database} = require('../config/helpers');
 
 
 
-// get all products
+// get all products ///////////
 router.get('/', function(req, res){
     let page =  (req.query.page != undefined && req.query.page != 0) ? req.query.page : 1;
     const limit = (req.query.limit != undefined && req.query.page != 0) ? req.query.limit : 10; // limit for page
@@ -50,9 +50,86 @@ router.get('/', function(req, res){
     }
 })
 .catch(err => console.log(err));
+});
 
 
 
+// select product by category ;) //////////
+
+router.get('/category/:catName', (req, res) => { 
+    let page = (req.query.page !== undefined && req.query.page !== 0) ? req.query.page : 1;   
+    const limit = (req.query.limit !== undefined && req.query.limit !== 0) ? req.query.limit : 10;  
+    let startValue;
+    let endValue;
+    if (page > 0) {
+        startValue = (page * limit) - limit;      
+        endValue = page * limit;                 
+    } else {
+        startValue = 0;
+        endValue = 10;
+    }
+
+
+    const cat_title = req.params.catName;
+
+    database.table('productos as p')
+        .join([
+            {
+                table: "categorias as c",
+                on: `c.id = p.cat_id WHERE c.nombre LIKE '%${cat_title}%' AND p.esta_eliminado = 0`
+            }
+        ])
+        .withFields(['c.nombre as categoria',
+            'p.nombre as nombre',
+            'p.precio',
+            'p.stock',
+            'p.descripcion',
+            'p.imagen',
+            'p.id'
+        ])
+        .slice(startValue, endValue)
+        .sort({id: 1})
+        .getAll()
+        .then(prods => {
+            if (prods.length > 0) {
+                res.status(200).json({
+                    count: prods.length,
+                    productos: prods
+                });
+            } else {
+                res.json({message: `No products found matching the category ${cat_title}`});
+            }
+        }).catch(err => res.json(err));
+
+});
+
+
+
+
+
+
+// new product /////////
+
+router.post('/new', (req,res) =>{    
+let {Nombre, Descripcion, catid} = req.body;
+console.log(Nombre);
+console.log(Descripcion);
+console.log(catid);
+
+if (catid != null && catid > 0){
+    database.table('productos')
+    .insert({
+        cat_id: catid,
+        nombre: Nombre,
+        Descripcion: Descripcion
+    }).then(
+        res.json({message: `success`})
+    )
+} else{
+    res.json({message: `please select a category`});
+}
+    
+  
 });
 
 
