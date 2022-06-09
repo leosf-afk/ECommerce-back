@@ -1,4 +1,6 @@
 const express = require('express');
+const { json } = require('express/lib/response');
+const { parse } = require('path');
 const router = express.Router();
 const {database} = require('../config/helpers');
 
@@ -110,16 +112,33 @@ router.get('/category/:catName', (req, res) => {
 
 // new product /////////
 
-router.post('/new', (req,res) =>{    
-let {Nombre, Descripcion, catid} = req.body;
+router.post('/new', async (req,res) =>{    
+let {Nombre, Descripcion, Cat}= req.body;
 console.log(Nombre);
 console.log(Descripcion);
-console.log(catid);
+console.log(Cat);
 
-if (catid != null && catid > 0){
+
+let id_cat = await database.table('categorias').filter({id : Cat}).withFields(['id']).get();
+
+//  id_cat=JSON.parse(JSON.stringify(id_cat))
+
+let value = 0;
+
+
+try {
+    value = Object.values(JSON.parse(JSON.stringify(id_cat)))
+
+   
+}catch (err) {
+    console.log('Error: ', err.message);
+}
+
+if (Cat != null && Cat == value){
+                
     database.table('productos')
     .insert({
-        cat_id: catid,
+        cat_id: Cat,
         nombre: Nombre,
         Descripcion: Descripcion
     }).then(
@@ -127,11 +146,22 @@ if (catid != null && catid > 0){
     )
 } else{
     res.json({message: `please select a category`});
-}
-    
-  
-});
+    console.log(value);
 
+}           
+
+
+                
+        //     console.log(id_cat)
+
+        // console.log(`id is ${value}`);
+
+    
+
+
+
+
+});
 
 
 
