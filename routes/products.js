@@ -148,20 +148,85 @@ if (Cat != null && Cat == value){
     res.json({message: `please select a category`});
     console.log(value);
 
-}           
-
-
-                
+}                           
         //     console.log(id_cat)
 
         // console.log(`id is ${value}`);
+});
+
+
+// edit product ////////
+
+router.put('/update/:productId', async (req, res) =>{
+    let productId = req.params.productId;
+
+    // search the product
+    let product = await database.table('productos').filter({id: productId}).get();
+
+    if(product) {
+        let nombreProducto = req.body.nombre;
+        let descripcionProducto = req.body.descripcion;
+        let precioProducto = req.body.precio;
+        let stockProducto= req.body.stock;
+        let imagenProducto = req.body.imagen;
+        let talleProducto= req.body.talle;
+        let marcaProducto= req.body.marca;
+        let cat_idProducto = req.body.cat_id;
+
+
+        // replace product info
+        database.table('productos').filter({id: productId}).update({
+            nombre: nombreProducto !== null ? nombreProducto : productos.nombre,
+            descripcion: descripcionProducto !== null ? descripcionProducto : productos.Descripcion,
+           precio: precioProducto !== null ? precioProducto : productos.precio,
+            stock: stockProducto !== null ? stockProducto : productos.stock,
+            imagen: imagenProducto !== null ? imagenProducto : productos.imagen,
+            talle: talleProducto !== null ? talleProducto : productos.talle,
+            marca: marcaProducto !== null ? marcaProducto : productos.marca,
+            cat_id: cat_idProducto !== null ? cat_idProducto : productos.cat_id
+        }).then( result => res.json('product updated successfully')).catch(err => res.json(err));
+    }
+});
+
+
+
+//delete product//////////
+
+
+router.put('/delete/:productId', async  (req, res) =>{
+    let productId = req.params.productId;
+
+    let productos = await database.table('productos').filter({id: productId}).withFields(['esta_eliminado']).get();
+
+
+    if(productos.esta_eliminado ==0){
+
+        database.table('productos').filter({id: productId }).update({
+            esta_eliminado : 1
+        }).then( result => res.json('product deleted successfully')).catch(err => res.json(err));
+
+    }
+    if(productos.esta_eliminado ==1){
+        database.table('productos').filter({id: productId }).update({
+            esta_eliminado : 0
+        }).then( result => res.json('product restored successfully')).catch(err => res.json(err));
+    }
+
+
+
+
+
+
 
     
-
-
-
-
 });
+
+
+
+
+
+
+
 
 
 
