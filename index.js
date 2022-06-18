@@ -21,11 +21,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 //import routes
 
  const productsRoute =require("./routes/products");
+ const ordersRoute = require("./routes/orders");
 //  const  userRoute =require("./routes/users");
 
 
 // use routes
 app.use('/api/products', productsRoute);
+app.use('/api/orders', ordersRoute);
+
 // app.use('/api/users', userRouter);
 
 
