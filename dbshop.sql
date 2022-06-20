@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 03-06-2022 a las 23:33:13
+-- Tiempo de generación: 20-06-2022 a las 21:58:50
 -- Versión del servidor: 10.4.24-MariaDB
 -- Versión de PHP: 8.1.6
 
@@ -40,7 +40,8 @@ CREATE TABLE `categorias` (
 
 INSERT INTO `categorias` (`id`, `nombre`, `imagen`, `esta_eliminado`) VALUES
 (1, 'fajas', '', 0),
-(2, 'gel', '', 0);
+(2, 'gel', '', 0),
+(3, 'categoria3', NULL, 0);
 
 -- --------------------------------------------------------
 
@@ -52,6 +53,28 @@ CREATE TABLE `pedidos` (
   `id` int(11) NOT NULL,
   `usuario_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `pedidos`
+--
+
+INSERT INTO `pedidos` (`id`, `usuario_id`) VALUES
+(9, NULL),
+(10, NULL),
+(11, NULL),
+(12, NULL),
+(13, NULL),
+(14, NULL),
+(15, NULL),
+(3, 1),
+(4, 1),
+(5, 1),
+(6, 1),
+(7, 1),
+(8, 1),
+(1, 2),
+(2, 2),
+(16, 2);
 
 -- --------------------------------------------------------
 
@@ -65,6 +88,15 @@ CREATE TABLE `pedidos_detalles` (
   `producto_id` int(11) DEFAULT NULL,
   `cantidad` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `pedidos_detalles`
+--
+
+INSERT INTO `pedidos_detalles` (`id`, `pedido_id`, `producto_id`, `cantidad`) VALUES
+(1, 14, 2, 2),
+(2, 15, 2, 2),
+(3, 16, 2, 2);
 
 -- --------------------------------------------------------
 
@@ -90,8 +122,19 @@ CREATE TABLE `productos` (
 --
 
 INSERT INTO `productos` (`id`, `nombre`, `descripcion`, `precio`, `stock`, `imagen`, `talle`, `marca`, `cat_id`, `esta_eliminado`) VALUES
-(2, 'gelF', 'gel especial', 15, 10, '', '', 'asdasd', 1, 1),
-(8, 'pepepepep', 'asdas', NULL, NULL, NULL, NULL, NULL, 1, 0);
+(2, 'gelF', 'gel especial', 15, 4, '', '', 'asdasd', 1, 1),
+(8, 'pepepepep', 'asdas', NULL, NULL, NULL, NULL, NULL, 1, 0),
+(9, 'producto 1', 'asdas', NULL, NULL, NULL, NULL, NULL, 1, 0),
+(11, 'producto 2', 'asdas', NULL, NULL, NULL, NULL, NULL, 2, 0),
+(12, 'producto 3', 'asdas', NULL, NULL, NULL, NULL, NULL, 2, 0),
+(13, 'producto 3', 'asdas', NULL, NULL, NULL, NULL, NULL, 3, 0),
+(14, 'producto 4', 'asdas', NULL, NULL, NULL, NULL, NULL, 1, 0),
+(17, 'producto 5', 'asdas', NULL, NULL, NULL, NULL, NULL, 2, 0),
+(18, 'producto 6', 'asdas', NULL, NULL, NULL, NULL, NULL, 3, 0),
+(19, 'producto 9', 'asdas', NULL, NULL, NULL, NULL, NULL, 2, 0),
+(20, 'producto 10', 'asdas', NULL, NULL, NULL, NULL, NULL, 2, 0),
+(21, 'prueba actualizar', NULL, 115, 10, 'url', 'XL', 'marcagenerica', 1, 0),
+(22, 'producto 12', 'asdas', NULL, NULL, NULL, NULL, NULL, 2, 0);
 
 -- --------------------------------------------------------
 
@@ -108,6 +151,14 @@ CREATE TABLE `usuarios` (
   `apellidos` varchar(25) DEFAULT NULL,
   `rol` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Volcado de datos para la tabla `usuarios`
+--
+
+INSERT INTO `usuarios` (`id`, `usuario`, `contraseña`, `email`, `nombres`, `apellidos`, `rol`) VALUES
+(1, 'leonardo', '123456789', 'ejmpl@', 'leonardo Daniel', 'gomezParodi', 777),
+(2, 'jose', '123456789', 'ejmpl@', 'jose', 'fulano', 555);
 
 --
 -- Índices para tablas volcadas
@@ -155,31 +206,31 @@ ALTER TABLE `usuarios`
 -- AUTO_INCREMENT de la tabla `categorias`
 --
 ALTER TABLE `categorias`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `pedidos`
 --
 ALTER TABLE `pedidos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT de la tabla `pedidos_detalles`
 --
 ALTER TABLE `pedidos_detalles`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `productos`
 --
 ALTER TABLE `productos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
 --
 ALTER TABLE `usuarios`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- Restricciones para tablas volcadas

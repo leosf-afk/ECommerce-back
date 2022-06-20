@@ -1,8 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const {database} = require('../config/helpers');
-const crypto = require('crypto');
-
+const crypto = require('crypto')
 
 //new order/////////
 
@@ -12,44 +11,46 @@ router.post('/new', async (req, res) => {
     console.log(products);
 
      if (userId !== null && userId > 0) {
-        database.table('orders')
+        database.table('pedidos')
             .insert({
-                user_id: userId
+               usuario_id: userId
             }).then((newOrderId) => {
 
-            if (newOrderId > 0) {
+            if (newOrderId.insertId > 0) {
                 products.forEach(async (p) => {
 
-                        let data = await database.table('products').filter({id: p.id}).withFields(['quantity']).get();
+                        let data = await database.table('productos').filter({id: p.id}).withFields(['stock']).get();
 
+
+                        
 
 
                     let inCart = parseInt(p.incart);
 
                     // Deduct the number of pieces ordered from the quantity in database
 
-                    if (data.quantity > 0) {
-                        data.quantity = data.quantity - inCart;
+                    if (data.stock > 0) {
+                        data.stock = data.stock - inCart;
 
-                        if (data.quantity < 0) {
-                            data.quantity = 0;
+                        if (data.stock < 0) {
+                            data.stock = 0;
                         }
 
                     } else {
-                        data.quantity = 0;
+                        data.stock = 0;
                     }
 
                     // Insert order details w.r.t the newly created order Id
-                    database.table('orders_details')
+                    database.table('pedidos_detalles')
                         .insert({
-                            order_id: newOrderId,
-                            product_id: p.id,
-                            quantity: inCart
+                            pedido_id: newOrderId.insertId,
+                            producto_id: p.id,
+                            cantidad: inCart
                         }).then(newId => {
-                        database.table('products')
+                        database.table('productos')
                             .filter({id: p.id})
                             .update({
-                                quantity: data.quantity
+                                stock : data.stock
                             }).then(successNum => {
                         }).catch(err => console.log(err));
                     }).catch(err => console.log(err));
@@ -61,8 +62,8 @@ router.post('/new', async (req, res) => {
             res.json({
                 message: `Order successfully placed with order id ${newOrderId}`,
                 success: true,
-                order_id: newOrderId,
-                products: products
+                pedido_id: newOrderId.insertId,
+                productos: products
             })
         }).catch(err => res.json(err));
     }
@@ -72,6 +73,13 @@ router.post('/new', async (req, res) => {
     }
 
 });
+
+
+
+//cancel order
+
+
+
 
 
 

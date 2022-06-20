@@ -113,45 +113,59 @@ router.get('/category/:catName', (req, res) => {
 // new product /////////
 
 router.post('/new', async (req,res) =>{    
-let {Nombre, Descripcion, Cat}= req.body;
-console.log(Nombre);
-console.log(Descripcion);
-console.log(Cat);
+let {nombre, descripcion, cat}= req.body;
+console.log(nombre);
+console.log(descripcion);
+console.log(cat);
 
 
-let id_cat = await database.table('categorias').filter({id : Cat}).withFields(['id']).get();
 
-//  id_cat=JSON.parse(JSON.stringify(id_cat))
+let id_cat = await database.table('categorias').filter({id : cat}).withFields(['id']).get();
 
-let value = 0;
-
+let value;
 
 try {
-    value = Object.values(JSON.parse(JSON.stringify(id_cat)))
+     value = id_cat.id;
 
-   
-}catch (err) {
+    
+} catch (err) {
     console.log('Error: ', err.message);
+
 }
 
-if (Cat != null && Cat == value){
-                
+
+if (value == cat && value != undefined && value > 0) {
+
     database.table('productos')
     .insert({
-        cat_id: Cat,
-        nombre: Nombre,
-        Descripcion: Descripcion
+        cat_id: cat,
+        nombre: nombre,
+        Descripcion: descripcion
     }).then(
         res.json({message: `success`})
     )
-} else{
-    res.json({message: `please select a category`});
-    console.log(value);
+    
+}
+else{
+    res.json({message: "the category doesn't exist or it's incorrect"});
+}
 
-}                           
-        //     console.log(id_cat)
 
-        // console.log(`id is ${value}`);
+// if (Cat != null && Cat == id_cat.id ){
+                
+//     database.table('productos')
+//     .insert({
+//         cat_id: Cat,
+//         nombre: Nombre,
+//         Descripcion: Descripcion
+//     }).then(
+//         res.json({message: `success`})
+//     )
+// } else{
+//     res.json({message: `please select a category`});
+
+// }                           
+       
 });
 
 
