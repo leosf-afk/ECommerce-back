@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const {database} = require('../config/helpers');
 const crypto = require('crypto')
+const transporter = require('../config/mailer.ts');
 
 router.post('/new', async (req, res) => {
     let {userId, products} = req.body;
@@ -182,10 +183,13 @@ router.get('/userLast/:username', async (req, res) => {
     let prove = await database.table('pedidos').withFields(['id']).filter({usuario_id: user }).sort({id: -1}).get();
 
     let idOrder = prove.id;
-   
-  console.log(idOrder);
 
-    database.table('pedidos_detalles as pd')
+    let messageUser;
+   
+  //console.log(idOrder);
+
+   
+     let ejemplito = await   database.table('pedidos_detalles as pd')
         .join([
             {
                 table: 'pedidos as pe',
@@ -202,14 +206,59 @@ router.get('/userLast/:username', async (req, res) => {
         ])
         .withFields(['pe.id as orderId', 'p.id', 'p.nombre', 'p.descripcion', 'p.precio', 'pd.cantidad', 'pd.fecha', 'u.usuario'])
         .getAll()
-        .then(orders => {
-            if (orders.length > 0) {
-                res.json(orders);
-            } else {
-                res.json({message: "No orders found"});
-            }
 
-        }).catch(err => res.json(err));
+
+        if (ejemplito != undefined && ejemplito != null) {
+                            res.json(ejemplito);
+
+                          // ejemplito=JSON.parse(JSON.stringify(ejemplito));
+            
+                            console.log(ejemplito[0].orderId);
+                            // console.log(ejemplito[0].id);
+                            // console.log(ejemplito[0].nombre);
+                            // console.log(ejemplito[0].descripcion);
+                            // console.log(ejemplito[0].precio);
+                            // console.log(ejemplito[0].cantidad);
+                            // console.log(ejemplito[0].fecha);
+                            // console.log(ejemplito[0].usuario);
+
+                         //   console.log(ejemplito[1].nombre);
+                            if (ejemplito[2] != undefined ) {
+                                console.log('tres productos')
+                                
+                                 messageUser = await transporter.sendMail({
+                                                    from: '"api_eccomerce👻" <xxrastaxx865@gmail.com>', // sender address
+                                                    to: "xxrastaxx55@gmail.com", // list of receivers
+                                                    subject: "Nuevo pedido", // Subject line
+                                                    html: `<b> el usuario ${ejemplito[0].usuario} , pidio ${ejemplito[0].nombre} (${ejemplito[0].cantidad}), ${ejemplito[1].nombre} (${ejemplito[1].cantidad}), ${ejemplito[2].nombre} (${ejemplito[2].cantidad})
+                                                    , la fecha ${ejemplito[0].fecha} </b>`, // html body
+                                                });
+                                
+                            }
+                            else if(ejemplito[1] != undefined) {
+                                console.log('dos productos')
+                                
+                            }
+                            else{
+                                console.log('un productos')
+
+                            }
+
+
+            // let mensajito = await transporter.sendMail({
+            //                 from: '"Fred Foo 👻" <xxrastaxx865@gmail.com>', // sender address
+            //                 to: "xxrastaxx55@gmail.com", // list of receivers
+            //                 subject: "buenas", // Subject line
+            //                 html: `<b> el usuario ${ejemplito[0].usuario} , pidio ${ejemplito[0].cantidad}, la fecha ${ejemplito[0].fecha} </b>`, // html body
+            //             });
+            
+        }
+        else{
+            res.json({message: "No orders found"});
+        }
+
+
+        
 });
 
 
