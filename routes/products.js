@@ -78,7 +78,7 @@ router.get('/category/:catName', (req, res) => {
         .join([
             {
                 table: "categorias as c",
-                on: `c.id = p.cat_id WHERE c.nombre LIKE '%${cat_title}%' AND p.esta_eliminado = 0`
+                on: `c.id = p.cat_id WHERE c.nombre LIKE '%${cat_title}%' AND p.esta_eliminado = 0 AND p.stock != 0 `
             }
         ])
         .withFields(['c.nombre as categoria',
@@ -104,6 +104,15 @@ router.get('/category/:catName', (req, res) => {
         }).catch(err => res.json(err));
 
 });
+
+
+
+
+/////search one product  ///////////
+
+
+
+
 
 
 
@@ -175,16 +184,44 @@ router.put('/update/:productId', async (req, res) =>{
 
 
         // replace product info
-        database.table('productos').filter({id: productId}).update({
-            nombre: nombreProducto !== null ? nombreProducto : productos.nombre,
-            descripcion: descripcionProducto !== null ? descripcionProducto : productos.Descripcion,
-           precio: precioProducto !== null ? precioProducto : productos.precio,
-            stock: stockProducto !== null ? stockProducto : productos.stock,
-            imagen: imagenProducto !== null ? imagenProducto : productos.imagen,
-            talle: talleProducto !== null ? talleProducto : productos.talle,
-            marca: marcaProducto !== null ? marcaProducto : productos.marca,
-            cat_id: cat_idProducto !== null ? cat_idProducto : productos.cat_id
-        }).then( result => res.json('product updated successfully')).catch(err => res.json(err));
+
+        if (nombreProducto != null && nombreProducto != undefined) {
+
+            database.table('productos').filter({id: productId}).update({
+                nombre: nombreProducto
+            })
+        }
+        else{
+
+            database.table('productos').filter({id: productId}).update({
+            nombre: productos.nombre
+        })
+        }
+        /////
+
+        if (descripcionProducto != null && descripcionProducto != undefined) {
+
+            database.table('productos').filter({id: productId}).update({
+                nombre: descripcionProducto
+            })
+        }
+        else{
+
+            database.table('productos').filter({id: productId}).update({
+            nombre: productos.descripcion
+        })
+        }
+
+
+
+
+
+
+
+
+
+
+      
     }
 });
 
@@ -211,12 +248,6 @@ router.put('/delete/:productId', async  (req, res) =>{
             esta_eliminado : 0
         }).then( result => res.json('product restored successfully')).catch(err => res.json(err));
     }
-
-
-
-
-
-
 
     
 });
