@@ -106,18 +106,37 @@ router.get('/category/:catName', (req, res) => {
 });
 
 
-
-
 /////search one product  ///////////
+router.get('/search/:product', (req, res) => {
 
+    let prod = req.params.product;
 
+    database.table('productos as p')
+    .join([
+        {
+            table: "categorias as c",
+            on: `c.id = p.cat_id WHERE p.nombre LIKE '%${prod}%' AND p.esta_eliminado = 0 AND p.stock != 0 `
+        }
+    ])
+    .withFields(['p.nombre as nombre',
+    'c.nombre as categoria',
+        'p.precio',
+        'p.stock',
+        'p.descripcion',
+        'p.imagen',
+        'p.id'
+    ])
+    .getAll()
+    .then(result => {
+        if (result.length > 0) {
+            res.json(result);
+        } else {
+            res.json({message: "No product found"});
+        }
 
-
-
-
-
-
-
+    }).catch(err => res.json(err));
+   
+});
 
 // new product /////////
 
@@ -180,7 +199,22 @@ router.put('/update/:productId', async (req, res) =>{
         let imagenProducto = req.body.imagen;
         let talleProducto= req.body.talle;
         let marcaProducto= req.body.marca;
-        let cat_idProducto = req.body.cat_id;
+         let cat_idProducto = req.body.cat_id;
+         let categoryId;
+
+
+        let idCat = await database.table('categorias').filter({id : cat_idProducto}).withFields(['id']).get();
+
+
+
+        try {
+           categoryId = Object.values(JSON.parse(JSON.stringify(id_cat)))
+        
+           
+        }catch (err) {
+            console.log('Error: ', err.message);
+        }
+
 
 
         // replace product info
@@ -194,34 +228,118 @@ router.put('/update/:productId', async (req, res) =>{
         else{
 
             database.table('productos').filter({id: productId}).update({
-            nombre: productos.nombre
+                nombre: product.nombre
         })
         }
-        /////
-
+        /////////////////////////
         if (descripcionProducto != null && descripcionProducto != undefined) {
 
             database.table('productos').filter({id: productId}).update({
-                nombre: descripcionProducto
+                descripcion: descripcionProducto
             })
         }
         else{
 
             database.table('productos').filter({id: productId}).update({
-            nombre: productos.descripcion
+                descripcion: product.descripcion
         })
         }
+        //////////////////////////
+        if (precioProducto != null && precioProducto != undefined) {
 
+            database.table('productos').filter({id: productId}).update({
+                precio: precioProducto
+            })
+        }
+        else{
 
+            database.table('productos').filter({id: productId}).update({
+                precio: product.precio
+        })
+        }
+        /////////////////////////
+        if (stockProducto != null && stockProducto != undefined) {
 
+            database.table('productos').filter({id: productId}).update({
+                stock: stockProducto
+            })
+        }
+        else{
 
+            database.table('productos').filter({id: productId}).update({
+                stock: product.stock
+        })
+        }
+        ///////////////////////////////
+        if (imagenProducto != null && imagenProducto != undefined) {
 
+            database.table('productos').filter({id: productId}).update({
+                imagen: imagenProducto
+            })
+        }
+        else{
 
+            database.table('productos').filter({id: productId}).update({
+                imagen: product.imagen
+        })
+        }
+        ////////////////////////////////
+        if (talleProducto != null && talleProducto != undefined) {
 
+            database.table('productos').filter({id: productId}).update({
+                talle: talleProducto
+            })
+        }
+        else{
 
+            database.table('productos').filter({id: productId}).update({
+                talle: product.talle
+        })
+        }
+        //////////////////////////////
+        if (marcaProducto != null && marcaProducto != undefined) {
 
+            database.table('productos').filter({id: productId}).update({
+                marca: marcaProducto
+            })
+        }
+        else{
 
-      
+            database.table('productos').filter({id: productId}).update({
+                marca: product.marca
+        })
+        }
+        /////////////////////////////////
+
+        if (categoryId != undefined) {
+
+            if (cat_idProducto == categoryId && cat_idProducto != undefined &&  cat_idProducto != null ) {
+
+                database.table('productos').filter({id: productId}).update({
+                    cat_id: cat_idProducto
+                }).then(
+                    res.json({message: `success`})
+                )
+            }
+            else{
+    
+                database.table('productos').filter({id: productId}).update({
+                    cat_id: product.cat_id
+            }).then(
+                res.json({message: `success`})
+            )
+            }
+            
+        }
+        else{
+    
+            database.table('productos').filter({id: productId}).update({
+                cat_id: product.cat_id
+        }).then(
+            res.json({message: `success`})
+        )
+        }
+
     }
 });
 
@@ -229,34 +347,25 @@ router.put('/update/:productId', async (req, res) =>{
 
 //delete product//////////
 
-
 router.put('/delete/:productId', async  (req, res) =>{
     let productId = req.params.productId;
 
     let productos = await database.table('productos').filter({id: productId}).withFields(['esta_eliminado']).get();
 
-
     if(productos.esta_eliminado ==0){
 
         database.table('productos').filter({id: productId }).update({
             esta_eliminado : 1
-        }).then( result => res.json('product deleted successfully')).catch(err => res.json(err));
+        }).then( result => res.json('product has been deleted successfully')).catch(err => res.json(err));
 
     }
     if(productos.esta_eliminado ==1){
         database.table('productos').filter({id: productId }).update({
             esta_eliminado : 0
-        }).then( result => res.json('product restored successfully')).catch(err => res.json(err));
+        }).then( result => res.json('product has been restored successfully')).catch(err => res.json(err));
     }
 
-    
 });
-
-
-
-
-
-
 
 
 
