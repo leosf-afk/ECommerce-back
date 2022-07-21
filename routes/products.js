@@ -141,13 +141,11 @@ router.get('/search/:product', (req, res) => {
 // new product /////////
 
 router.post('/new', async (req,res) =>{    
-let {Nombre, Descripcion, Cat}= req.body;
-console.log(Nombre);
-console.log(Descripcion);
-console.log(Cat);
+let {nombreProducto,descripcionProducto,precioProducto,stockProducto,imagenProducto,talleProducto,marcaProducto,cat_idProducto}= req.body;
 
 
-let id_cat = await database.table('categorias').filter({id : Cat}).withFields(['id']).get();
+
+let id_cat = await database.table('categorias').filter({id : cat_idProducto}).withFields(['id']).get();
 
 //  id_cat=JSON.parse(JSON.stringify(id_cat))
 
@@ -162,19 +160,30 @@ try {
     console.log('Error: ', err.message);
 }
 
-if (Cat != null && Cat == value){
+if (cat_idProducto != null && cat_idProducto == value){
                 
     database.table('productos')
     .insert({
-        cat_id: Cat,
-        nombre: Nombre,
-        Descripcion: Descripcion
-    }).then(
-        res.json({message: `success`})
+        cat_id: cat_idProducto,
+        nombre: nombreProducto,
+        descripcion: descripcionProducto,
+        precio: precioProducto,
+        stock: stockProducto,
+        imagen: imagenProducto,
+        talle: talleProducto,
+        marca: marcaProducto
+
+    }).then( result => {
+        res.json({
+            success: true
+        })
+
+    }
     )
+        // res.json({message: `success`})
+    
 } else{
     res.json({message: `please select a category`});
-    console.log(value);
 
 }                           
         //     console.log(id_cat)
@@ -192,23 +201,15 @@ router.put('/update/:productId', async (req, res) =>{
     let product = await database.table('productos').filter({id: productId}).get();
 
     if(product) {
-        let nombreProducto = req.body.nombre;
-        let descripcionProducto = req.body.descripcion;
-        let precioProducto = req.body.precio;
-        let stockProducto= req.body.stock;
-        let imagenProducto = req.body.imagen;
-        let talleProducto= req.body.talle;
-        let marcaProducto= req.body.marca;
-         let cat_idProducto = req.body.cat_id;
-         let categoryId;
-
-
-        let idCat = await database.table('categorias').filter({id : cat_idProducto}).withFields(['id']).get();
-
-
-
+        let {nombreProducto,descripcionProducto,precioProducto,stockProducto,imagenProducto,talleProducto,marcaProducto,cat_idProducto} = req.body;
+        let categoryId;
+        let idCat;
         try {
-           categoryId = Object.values(JSON.parse(JSON.stringify(id_cat)))
+
+            idCat = await database.table('categorias').filter({id : cat_idProducto}).withFields(['id']).get();
+
+
+           categoryId = Object.values(JSON.parse(JSON.stringify(idCat)))
         
            
         }catch (err) {
