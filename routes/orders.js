@@ -3,6 +3,7 @@ const router = express.Router();
 const {database} = require('../config/helpers');
 const crypto = require('crypto')
 const transporter = require('../config/mailer.ts');
+const { Console } = require('console');
 
 router.post('/new', async (req, res) => {
     let {userId, products} = req.body;
@@ -13,7 +14,8 @@ router.post('/new', async (req, res) => {
      if (userId !== null && userId > 0) {
         database.table('pedidos')
             .insert({
-               usuario_id: userId
+               usuario_id: userId,
+               fecha: new Date()
             }).then((newOrderId) => {
 
             if (newOrderId.insertId > 0) {
@@ -23,8 +25,7 @@ router.post('/new', async (req, res) => {
 
 
                     let inCart = parseInt(p.incart);
-                    const id = newOrderId.insertId;
-
+                    
                     // Deduct the number of pieces ordered from the quantity in database
 
                     if (data.stock > 0) {
@@ -43,8 +44,7 @@ router.post('/new', async (req, res) => {
                         .insert({
                             pedido_id: newOrderId.insertId,
                             producto_id: p.id,
-                            cantidad: inCart,
-                            fecha: new Date()
+                            cantidad: inCart
                         }).then(newId => {
                         database.table('productos')
                             .filter({id: p.id})
@@ -77,32 +77,67 @@ router.post('/new', async (req, res) => {
 
 //cancel order///////////////
 
-router.put('/cancel/:pedido_detalleId', async  (req, res) =>{
-    let pedidoDetalleId = req.params.pedido_detalleId;
+router.put('/cancel/:pedidoid', async  (req, res) =>{
+    let pedidoId = req.params.pedidoid;
 
-    let PedidoDetalle = await database.table('pedidos_detalles').filter({id: pedidoDetalleId}).withFields(['cancelado', 'producto_id', 'cantidad']).get();
+    let PedidoDetalle = await database.table('pedidos_detalles').filter({pedido_id: pedidoId}).withFields(['producto_id', 'cantidad']).getAll();
+
+    let pedido = await database.table('pedidos').filter({id: pedidoId}).withFields(['cancelado']).get();
 
 
+    if(pedido.cancelado == 0){
 
-    if(PedidoDetalle.cancelado == 0 || PedidoDetalle.cancelado == null ){
+        database.table("pedidos").filter({id:pedidoId}).update({
+            cancelado : 1
+        }).then((updatedOrder) => {
 
-        let prods = await database.table('productos').filter({id: PedidoDetalle.producto_id}).withFields(['stock']).get();
 
-        database.table('pedidos_detalles').filter({id: pedidoDetalleId }).update({
-             cancelado : 1
-        }).then(orderId => {
+            if (updatedOrder) {
+
+                 PedidoDetalle.forEach(async (x) =>{
+    
+    
+            let prods = await database.table('productos').filter({id: x.producto_id}).withFields(['stock']).get();
+
+
             database.table('productos')
-            .filter({id: PedidoDetalle.producto_id})
+            .filter({id: x.producto_id})
             .update({
-                stock:  (PedidoDetalle.cantidad + prods.stock)
-            }).then( result => res.json('order canceled successfully')).catch(err => res.json(err));
-        });
-
+                stock:  (x.cantidad + prods.stock)
+            })
+        })
+            }else{
+                res.json('error updating stock');
+            }
+            res.json({
+                message: `order canceled successfully`,
+                success: true
+            })
+            
+        }).catch(err => res.json(err));
     }
     else{
-        res.json('error deleting order');
-        
+        res.json('error, order deleted yet')
     }
+        // PedidoDetalle.forEach(async (x) =>{
+    
+    
+        //     let prods = await database.table('productos').filter({id: x.producto_id}).withFields(['stock']).get();
+
+
+        // database.table('pedidos').filter({id: pedidoId}).update({
+        //      cancelado : 1
+        // }).then(orderId => {
+        //     database.table('productos')
+        //     .filter({id: x.producto_id})
+        //     .update({
+        //         stock:  (x.cantidad + prods.stock)
+        //     })
+        // });
+
+        // })
+        
+
     
     
 });
