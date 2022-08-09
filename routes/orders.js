@@ -160,7 +160,7 @@ router.get('/', (req, res) => {
                 on: 'u.id = pe.usuario_id'
             }
         ])
-        .withFields(['p.id', 'p.nombre', 'p.descripcion', 'p.precio', 'pd.cantidad', 'pd.fecha', 'u.usuario'])
+        .withFields(['p.id', 'p.nombre', 'p.descripcion', 'p.precio', 'pd.cantidad', 'pe.fecha', 'u.usuario'])
         .getAll()
         .then(orders => {
             if (orders.length > 0) {
@@ -195,7 +195,7 @@ router.get('/user/:username', (req, res) => {
                 on: `u.id = pe.usuario_id WHERE u.usuario LIKE '%${user}%'`
             }
         ])
-        .withFields(['p.id', 'p.nombre', 'p.descripcion', 'p.precio', 'pd.cantidad', 'pd.fecha', 'u.usuario'])
+        .withFields(['p.id', 'p.nombre', 'p.descripcion', 'p.precio', 'pd.cantidad', 'pe.fecha', 'u.usuario'])
         .getAll()
         .then(orders => {
             if (orders.length > 0) {
@@ -212,12 +212,18 @@ router.get('/user/:username', (req, res) => {
 //get the last order from one user//////
 
 
-router.get('/userLast/:username', async (req, res) => {
+router.get('/userLast/:userId', async (req, res) => {
 
-    let user = req.params.username;
+    let user = req.params.userId;
     let prove = await database.table('pedidos').withFields(['id']).filter({usuario_id: user }).sort({id: -1}).get();
+    let idOrder;
 
-    let idOrder = prove.id;
+    try {
+         idOrder = prove.id;
+    } catch (err) {
+        console.log('Error: ', err.message);
+    }
+
 
     let messageUser;
    
@@ -239,54 +245,94 @@ router.get('/userLast/:username', async (req, res) => {
                 on: `u.id = pe.usuario_id WHERE u.id LIKE '%${user}%' AND pe.id LIKE '%${idOrder}%'`
             }
         ])
-        .withFields(['pe.id as orderId', 'p.id', 'p.nombre', 'p.descripcion', 'p.precio', 'pd.cantidad', 'pd.fecha', 'u.usuario'])
+        .withFields(['pe.id as orderId', 'p.id', 'p.nombre', 'p.descripcion', 'p.precio', 'pd.cantidad', 'pe.fecha', 'u.usuario'])
         .getAll()
 
 
         if (ejemplito != undefined && ejemplito != null) {
-                            res.json(ejemplito);
+            let valor = 0;
 
-                          // ejemplito=JSON.parse(JSON.stringify(ejemplito));
+            let prods = [];
+
+
+            ejemplito.forEach(async (e) =>{
+
+                 valor = valor + e.precio;
+
+                 for (let i =0; i < e.orderId; i++) {
+
+                    prods[i] += e.nombre;
+
+                    prods[i] += ",";
+                    
+                 }
+
+                 console.log(e.cantidad);
+
+            })
+            messageUser = await transporter.sendMail({
+                                            from: '"api_eccomerce👻" <xxrastaxx865@gmail.com>', // sender address
+                                            to: "xxrastaxx55@gmail.com", // list of receivers
+                                            subject: "Nuevo pedido", // Subject line
+                                            html: `<b> el usuario ${ejemplito[0].usuario} , pidio ${prods} por un valor total de ${valor}
+                                            , la fecha ${ejemplito[0].fecha} </b>`, // html body
+                                        });
+            res.json({
+                message: `email sended successfuly`,
+                success: true
+            })
+
+
+
+
+
+            console.log(ejemplito[0].usuario);
+            console.log(prods);
+            console.log(valor);
+            console.log(ejemplito[0].fecha);
+
+
+
+
+
+
+
+
+
+                        //     res.json(ejemplito);
+
+                        //   // ejemplito=JSON.parse(JSON.stringify(ejemplito));
             
-                            console.log(ejemplito[0].orderId);
-                            // console.log(ejemplito[0].id);
-                            // console.log(ejemplito[0].nombre);
-                            // console.log(ejemplito[0].descripcion);
-                            // console.log(ejemplito[0].precio);
-                            // console.log(ejemplito[0].cantidad);
-                            // console.log(ejemplito[0].fecha);
-                            // console.log(ejemplito[0].usuario);
+                        //     console.log(ejemplito[0].orderId);
+                        //     // console.log(ejemplito[0].id);
+                        //     // console.log(ejemplito[0].nombre);
+                        //     // console.log(ejemplito[0].descripcion);
+                        //     // console.log(ejemplito[0].precio);
+                        //     // console.log(ejemplito[0].cantidad);
+                        //     // console.log(ejemplito[0].fecha);
+                        //     // console.log(ejemplito[0].usuario);
 
-                         //   console.log(ejemplito[1].nombre);
-                            if (ejemplito[2] != undefined ) {
-                                console.log('tres productos')
+                        //  //   console.log(ejemplito[1].nombre);
+                        //     if (ejemplito[2] != undefined ) {
+                        //         console.log('tres productos')
                                 
-                                 messageUser = await transporter.sendMail({
-                                                    from: '"api_eccomerce👻" <xxrastaxx865@gmail.com>', // sender address
-                                                    to: "xxrastaxx55@gmail.com", // list of receivers
-                                                    subject: "Nuevo pedido", // Subject line
-                                                    html: `<b> el usuario ${ejemplito[0].usuario} , pidio ${ejemplito[0].nombre} (${ejemplito[0].cantidad}), ${ejemplito[1].nombre} (${ejemplito[1].cantidad}), ${ejemplito[2].nombre} (${ejemplito[2].cantidad})
-                                                    , la fecha ${ejemplito[0].fecha} </b>`, // html body
-                                                });
+                        //          messageUser = await transporter.sendMail({
+                        //                             from: '"api_eccomerce👻" <xxrastaxx865@gmail.com>', // sender address
+                        //                             to: "xxrastaxx55@gmail.com", // list of receivers
+                        //                             subject: "Nuevo pedido", // Subject line
+                        //                             html: `<b> el usuario ${ejemplito[0].usuario} , pidio ${ejemplito[0].nombre} (${ejemplito[0].cantidad}), ${ejemplito[1].nombre} (${ejemplito[1].cantidad}), ${ejemplito[2].nombre} (${ejemplito[2].cantidad})
+                        //                             , la fecha ${ejemplito[0].fecha} </b>`, // html body
+                        //                         });
                                 
-                            }
-                            else if(ejemplito[1] != undefined) {
-                                console.log('dos productos')
+                        //     }
+                        //     else if(ejemplito[1] != undefined) {
+                        //         console.log('dos productos')
                                 
-                            }
-                            else{
-                                console.log('un productos')
+                        //     }
+                        //     else{
+                        //         console.log('un productos')
 
-                            }
-
-
-            // let mensajito = await transporter.sendMail({
-            //                 from: '"Fred Foo 👻" <xxrastaxx865@gmail.com>', // sender address
-            //                 to: "xxrastaxx55@gmail.com", // list of receivers
-            //                 subject: "buenas", // Subject line
-            //                 html: `<b> el usuario ${ejemplito[0].usuario} , pidio ${ejemplito[0].cantidad}, la fecha ${ejemplito[0].fecha} </b>`, // html body
-            //             });
-            
+                        //     }
         }
         else{
             res.json({message: "No orders found"});
@@ -295,11 +341,6 @@ router.get('/userLast/:username', async (req, res) => {
 
         
 });
-
-
-
-
-
 
 
 module.exports = router;

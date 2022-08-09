@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 20-06-2022 a las 21:58:50
+-- Tiempo de generación: 09-08-2022 a las 06:39:31
 -- Versión del servidor: 10.4.24-MariaDB
 -- Versión de PHP: 8.1.6
 
@@ -51,30 +51,17 @@ INSERT INTO `categorias` (`id`, `nombre`, `imagen`, `esta_eliminado`) VALUES
 
 CREATE TABLE `pedidos` (
   `id` int(11) NOT NULL,
-  `usuario_id` int(11) DEFAULT NULL
+  `usuario_id` int(11) DEFAULT NULL,
+  `fecha` datetime DEFAULT NULL,
+  `cancelado` int(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Volcado de datos para la tabla `pedidos`
 --
 
-INSERT INTO `pedidos` (`id`, `usuario_id`) VALUES
-(9, NULL),
-(10, NULL),
-(11, NULL),
-(12, NULL),
-(13, NULL),
-(14, NULL),
-(15, NULL),
-(3, 1),
-(4, 1),
-(5, 1),
-(6, 1),
-(7, 1),
-(8, 1),
-(1, 2),
-(2, 2),
-(16, 2);
+INSERT INTO `pedidos` (`id`, `usuario_id`, `fecha`, `cancelado`) VALUES
+(1, 1, '2022-07-31 00:58:24', 1);
 
 -- --------------------------------------------------------
 
@@ -94,9 +81,9 @@ CREATE TABLE `pedidos_detalles` (
 --
 
 INSERT INTO `pedidos_detalles` (`id`, `pedido_id`, `producto_id`, `cantidad`) VALUES
-(1, 14, 2, 2),
-(2, 15, 2, 2),
-(3, 16, 2, 2);
+(1, 1, 2, 2),
+(2, 1, 8, 30),
+(3, 1, 12, 10);
 
 -- --------------------------------------------------------
 
@@ -108,7 +95,7 @@ CREATE TABLE `productos` (
   `id` int(11) NOT NULL,
   `nombre` varchar(100) DEFAULT NULL,
   `descripcion` varchar(300) DEFAULT NULL,
-  `precio` int(11) DEFAULT NULL,
+  `precio` float DEFAULT NULL,
   `stock` int(11) DEFAULT NULL,
   `imagen` varchar(300) DEFAULT NULL,
   `talle` varchar(50) DEFAULT NULL,
@@ -122,19 +109,21 @@ CREATE TABLE `productos` (
 --
 
 INSERT INTO `productos` (`id`, `nombre`, `descripcion`, `precio`, `stock`, `imagen`, `talle`, `marca`, `cat_id`, `esta_eliminado`) VALUES
-(2, 'gelF', 'gel especial', 15, 4, '', '', 'asdasd', 1, 1),
-(8, 'pepepepep', 'asdas', NULL, NULL, NULL, NULL, NULL, 1, 0),
-(9, 'producto 1', 'asdas', NULL, NULL, NULL, NULL, NULL, 1, 0),
-(11, 'producto 2', 'asdas', NULL, NULL, NULL, NULL, NULL, 2, 0),
-(12, 'producto 3', 'asdas', NULL, NULL, NULL, NULL, NULL, 2, 0),
-(13, 'producto 3', 'asdas', NULL, NULL, NULL, NULL, NULL, 3, 0),
-(14, 'producto 4', 'asdas', NULL, NULL, NULL, NULL, NULL, 1, 0),
-(17, 'producto 5', 'asdas', NULL, NULL, NULL, NULL, NULL, 2, 0),
+(2, 'gelillo', 'gel especial', 15, 3, '', '', 'asdasd', 1, 0),
+(8, 'pepepepep', 'asdas', 10, 100, NULL, NULL, NULL, 1, 0),
+(9, 'producto 1', 'asdas', NULL, 2, NULL, NULL, NULL, 1, 0),
+(11, 'producto 2', 'asda', NULL, NULL, NULL, NULL, NULL, 2, 0),
+(12, 'producto 3', 'asdas', NULL, 20, NULL, NULL, NULL, 2, 0),
+(13, 'producto 3', 'asdas', NULL, 100, NULL, NULL, NULL, 3, 0),
+(14, 'coca', 'asdas', NULL, 60, NULL, NULL, NULL, 1, 0),
+(17, 'pesi', 'asdas', NULL, 10, NULL, NULL, NULL, 2, 0),
 (18, 'producto 6', 'asdas', NULL, NULL, NULL, NULL, NULL, 3, 0),
 (19, 'producto 9', 'asdas', NULL, NULL, NULL, NULL, NULL, 2, 0),
 (20, 'producto 10', 'asdas', NULL, NULL, NULL, NULL, NULL, 2, 0),
-(21, 'prueba actualizar', NULL, 115, 10, 'url', 'XL', 'marcagenerica', 1, 0),
-(22, 'producto 12', 'asdas', NULL, NULL, NULL, NULL, NULL, 2, 0);
+(21, 'cambioNombreLeosama', 'pepito', 40.5, 10, 'url', 'xl', 'adidas', 1, 1),
+(22, 'zxccx', 'cxzczc', 1.4, 11, 'asd', 'asd', 'aw', 1, 0),
+(23, 'nuevoProducto', 'asdasd', 3.7, 50, 'url', 'xl', 'perro', 1, 0),
+(24, 'gatitos', 'gatitos para rosarinos', 150, 25, 'url', 'XLL', 'gato', 3, 0);
 
 -- --------------------------------------------------------
 
@@ -212,7 +201,7 @@ ALTER TABLE `categorias`
 -- AUTO_INCREMENT de la tabla `pedidos`
 --
 ALTER TABLE `pedidos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `pedidos_detalles`
@@ -224,7 +213,7 @@ ALTER TABLE `pedidos_detalles`
 -- AUTO_INCREMENT de la tabla `productos`
 --
 ALTER TABLE `productos`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
 
 --
 -- AUTO_INCREMENT de la tabla `usuarios`
