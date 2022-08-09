@@ -78,7 +78,7 @@ router.get('/category/:catName', (req, res) => {
         .join([
             {
                 table: "categorias as c",
-                on: `c.id = p.cat_id WHERE c.nombre LIKE '%${cat_title}%' AND p.esta_eliminado = 0`
+                on: `c.id = p.cat_id WHERE c.nombre LIKE '%${cat_title}%' AND p.esta_eliminado = 0 AND p.stock != 0 `
             }
         ])
         .withFields(['c.nombre as categoria',
@@ -106,17 +106,48 @@ router.get('/category/:catName', (req, res) => {
 });
 
 
+/////search one product  ///////////
+router.get('/search/:product', (req, res) => {
 
+    let prod = req.params.product;
 
+    database.table('productos as p')
+    .join([
+        {
+            table: "categorias as c",
+            on: `c.id = p.cat_id WHERE p.nombre LIKE '%${prod}%' AND p.esta_eliminado = 0 AND p.stock != 0 `
+        }
+    ])
+    .withFields(['p.nombre as nombre',
+    'c.nombre as categoria',
+        'p.precio',
+        'p.stock',
+        'p.descripcion',
+        'p.imagen',
+        'p.id'
+    ])
+    .getAll()
+    .then(result => {
+        if (result.length > 0) {
+            res.json(result);
+        } else {
+            res.json({message: "No product found"});
+        }
 
+    }).catch(err => res.json(err));
+   
+});
 
 // new product /////////
 
 router.post('/new', async (req,res) =>{    
-let {nombre, descripcion, cat}= req.body;
-console.log(nombre);
-console.log(descripcion);
-console.log(cat);
+
+let {nombreProducto,descripcionProducto,precioProducto,stockProducto,imagenProducto,talleProducto,marcaProducto,cat_idProducto}= req.body;
+
+
+
+let id_cat = await database.table('categorias').filter({id : cat_idProducto}).withFields(['id']).get();
+
 
 
 
@@ -134,21 +165,31 @@ try {
 }
 
 
-if (value == cat && value != undefined && value > 0) {
-
+if (cat_idProducto != null && cat_idProducto == value){
+                
     database.table('productos')
     .insert({
-        cat_id: cat,
-        nombre: nombre,
-        Descripcion: descripcion
-    }).then(
-        res.json({message: `success`})
+        cat_id: cat_idProducto,
+        nombre: nombreProducto,
+        descripcion: descripcionProducto,
+        precio: precioProducto,
+        stock: stockProducto,
+        imagen: imagenProducto,
+        talle: talleProducto,
+        marca: marcaProducto
+
+    }).then( result => {
+        res.json({
+            success: true
+        })
+
+    }
     )
+        // res.json({message: `success`})
     
-}
-else{
-    res.json({message: "the category doesn't exist or it's incorrect"});
-}
+} else{
+    res.json({message: `please select a category`});
+
 
 
 // if (Cat != null && Cat == id_cat.id ){
@@ -178,27 +219,146 @@ router.put('/update/:productId', async (req, res) =>{
     let product = await database.table('productos').filter({id: productId}).get();
 
     if(product) {
-        let nombreProducto = req.body.nombre;
-        let descripcionProducto = req.body.descripcion;
-        let precioProducto = req.body.precio;
-        let stockProducto= req.body.stock;
-        let imagenProducto = req.body.imagen;
-        let talleProducto= req.body.talle;
-        let marcaProducto= req.body.marca;
-        let cat_idProducto = req.body.cat_id;
+        let {nombreProducto,descripcionProducto,precioProducto,stockProducto,imagenProducto,talleProducto,marcaProducto,cat_idProducto} = req.body;
+        let categoryId;
+        let idCat;
+        try {
+
+            idCat = await database.table('categorias').filter({id : cat_idProducto}).withFields(['id']).get();
+
+
+           categoryId = Object.values(JSON.parse(JSON.stringify(idCat)))
+        
+           
+        }catch (err) {
+            console.log('Error: ', err.message);
+        }
+
 
 
         // replace product info
-        database.table('productos').filter({id: productId}).update({
-            nombre: nombreProducto !== null ? nombreProducto : productos.nombre,
-            descripcion: descripcionProducto !== null ? descripcionProducto : productos.Descripcion,
-           precio: precioProducto !== null ? precioProducto : productos.precio,
-            stock: stockProducto !== null ? stockProducto : productos.stock,
-            imagen: imagenProducto !== null ? imagenProducto : productos.imagen,
-            talle: talleProducto !== null ? talleProducto : productos.talle,
-            marca: marcaProducto !== null ? marcaProducto : productos.marca,
-            cat_id: cat_idProducto !== null ? cat_idProducto : productos.cat_id
-        }).then( result => res.json('product updated successfully')).catch(err => res.json(err));
+
+        if (nombreProducto != null && nombreProducto != undefined) {
+
+            database.table('productos').filter({id: productId}).update({
+                nombre: nombreProducto
+            })
+        }
+        else{
+
+            database.table('productos').filter({id: productId}).update({
+                nombre: product.nombre
+        })
+        }
+        /////////////////////////
+        if (descripcionProducto != null && descripcionProducto != undefined) {
+
+            database.table('productos').filter({id: productId}).update({
+                descripcion: descripcionProducto
+            })
+        }
+        else{
+
+            database.table('productos').filter({id: productId}).update({
+                descripcion: product.descripcion
+        })
+        }
+        //////////////////////////
+        if (precioProducto != null && precioProducto != undefined) {
+
+            database.table('productos').filter({id: productId}).update({
+                precio: precioProducto
+            })
+        }
+        else{
+
+            database.table('productos').filter({id: productId}).update({
+                precio: product.precio
+        })
+        }
+        /////////////////////////
+        if (stockProducto != null && stockProducto != undefined) {
+
+            database.table('productos').filter({id: productId}).update({
+                stock: stockProducto
+            })
+        }
+        else{
+
+            database.table('productos').filter({id: productId}).update({
+                stock: product.stock
+        })
+        }
+        ///////////////////////////////
+        if (imagenProducto != null && imagenProducto != undefined) {
+
+            database.table('productos').filter({id: productId}).update({
+                imagen: imagenProducto
+            })
+        }
+        else{
+
+            database.table('productos').filter({id: productId}).update({
+                imagen: product.imagen
+        })
+        }
+        ////////////////////////////////
+        if (talleProducto != null && talleProducto != undefined) {
+
+            database.table('productos').filter({id: productId}).update({
+                talle: talleProducto
+            })
+        }
+        else{
+
+            database.table('productos').filter({id: productId}).update({
+                talle: product.talle
+        })
+        }
+        //////////////////////////////
+        if (marcaProducto != null && marcaProducto != undefined) {
+
+            database.table('productos').filter({id: productId}).update({
+                marca: marcaProducto
+            })
+        }
+        else{
+
+            database.table('productos').filter({id: productId}).update({
+                marca: product.marca
+        })
+        }
+        /////////////////////////////////
+
+        if (categoryId != undefined) {
+
+            if (cat_idProducto == categoryId && cat_idProducto != undefined &&  cat_idProducto != null ) {
+
+                database.table('productos').filter({id: productId}).update({
+                    cat_id: cat_idProducto
+                }).then(
+                    res.json({message: `success`})
+                )
+            }
+            else{
+    
+                database.table('productos').filter({id: productId}).update({
+                    cat_id: product.cat_id
+            }).then(
+                res.json({message: `success`})
+            )
+            }
+            
+        }
+        else{
+    
+            database.table('productos').filter({id: productId}).update({
+                cat_id: product.cat_id
+        }).then(
+            res.json({message: `success`})
+        )
+        }
+
     }
 });
 
@@ -206,40 +366,25 @@ router.put('/update/:productId', async (req, res) =>{
 
 //delete product//////////
 
-
 router.put('/delete/:productId', async  (req, res) =>{
     let productId = req.params.productId;
 
     let productos = await database.table('productos').filter({id: productId}).withFields(['esta_eliminado']).get();
 
-
     if(productos.esta_eliminado ==0){
 
         database.table('productos').filter({id: productId }).update({
             esta_eliminado : 1
-        }).then( result => res.json('product deleted successfully')).catch(err => res.json(err));
+        }).then( result => res.json('product has been deleted successfully')).catch(err => res.json(err));
 
     }
     if(productos.esta_eliminado ==1){
         database.table('productos').filter({id: productId }).update({
             esta_eliminado : 0
-        }).then( result => res.json('product restored successfully')).catch(err => res.json(err));
+        }).then( result => res.json('product has been restored successfully')).catch(err => res.json(err));
     }
 
-
-
-
-
-
-
-    
 });
-
-
-
-
-
-
 
 
 
