@@ -141,24 +141,29 @@ router.get('/search/:product', (req, res) => {
 // new product /////////
 
 router.post('/new', async (req,res) =>{    
+
 let {nombreProducto,descripcionProducto,precioProducto,stockProducto,imagenProducto,talleProducto,marcaProducto,cat_idProducto}= req.body;
 
 
 
 let id_cat = await database.table('categorias').filter({id : cat_idProducto}).withFields(['id']).get();
 
-//  id_cat=JSON.parse(JSON.stringify(id_cat))
 
-let value = 0;
 
+
+let id_cat = await database.table('categorias').filter({id : cat}).withFields(['id']).get();
+
+let value;
 
 try {
-    value = Object.values(JSON.parse(JSON.stringify(id_cat)))
+     value = id_cat.id;
 
-   
-}catch (err) {
+    
+} catch (err) {
     console.log('Error: ', err.message);
+
 }
+
 
 if (cat_idProducto != null && cat_idProducto == value){
                 
@@ -185,10 +190,23 @@ if (cat_idProducto != null && cat_idProducto == value){
 } else{
     res.json({message: `please select a category`});
 
-}                           
-        //     console.log(id_cat)
 
-        // console.log(`id is ${value}`);
+
+// if (Cat != null && Cat == id_cat.id ){
+                
+//     database.table('productos')
+//     .insert({
+//         cat_id: Cat,
+//         nombre: Nombre,
+//         Descripcion: Descripcion
+//     }).then(
+//         res.json({message: `success`})
+//     )
+// } else{
+//     res.json({message: `please select a category`});
+
+// }                           
+       
 });
 
 

@@ -1,0 +1,294 @@
+/////////////////////////////////products///////////////////////////////////////////////
+
+///////////////////// new product////
+endPoint: http://localhost:3001/api/products/new
+POST:
+parameters:
+{
+     "nombreProducto": "string",
+     "descripcionProducto": "string",
+     "precioProducto": "float",
+     "stockProducto": "int",
+     "imagenProducto": "string",
+     "talleProducto": "string",
+     "marcaProducto": "string",
+     "cat_idProducto": "int"
+}
+return
+{
+    "message": "success"
+}
+///////////////////// edit one product////
+endPoint: http://localhost:3001/api/products/update/:id
+PUT:
+parameters:
+{
+     "nombreProducto": "string",
+     "descripcionProducto": "string",
+     "precioProducto": "float",
+     "stockProducto": "int",
+     "imagenProducto": "string",
+     "talleProducto": "string",
+     "marcaProducto": "string",
+     "cat_idProducto": "int"
+}
+return:
+{
+    "message": "success"
+}
+ 
+
+/////////////////////search one product////
+endPoint: http://localhost:3001/api/products/search/:productName
+GET:
+parameters:
+-
+return:
+[
+    {
+        "nombre": "coca",
+        "categoria": "fajas",
+        "precio": null,
+        "stock": 60,
+        "descripcion": "asdas",
+        "imagen": null,
+        "id": 14
+    }
+]
+////////////////////// select product by category ;) ///
+endPoint: http://localhost:3001/api/products/category/:categoryName
+GET
+parameters:
+-
+return:
+{
+    "count": 6,
+    "productos": [
+        {
+            "categoria": "fajas",
+            "nombre": "pepepepep",
+            "precio": 10,
+            "stock": 100,
+            "descripcion": "asdas",
+            "imagen": null,
+            "id": 8
+        },
+        {
+            "categoria": "fajas",
+            "nombre": "producto 1",
+            "precio": null,
+            "stock": 2,
+            "descripcion": "asdas",
+            "imagen": null,
+            "id": 9
+        },
+        {
+            "categoria": "fajas",
+            "nombre": "coca",
+            "precio": null,
+            "stock": 60,
+            "descripcion": "asdas",
+            "imagen": null,
+            "id": 14
+        },
+        {
+            "categoria": "fajas",
+            "nombre": "cambioNombreLeosama",
+            "precio": 40.5,
+            "stock": 10,
+            "descripcion": "pepito",
+            "imagen": "url",
+            "id": 21
+        },
+        {
+            "categoria": "fajas",
+            "nombre": "zxccx",
+            "precio": 1.4,
+            "stock": 11,
+            "descripcion": "cxzczc",
+            "imagen": "asd",
+            "id": 22
+        },
+        {
+            "categoria": "fajas",
+            "nombre": "nuevoProducto",
+            "precio": 3.7,
+            "stock": 50,
+            "descripcion": "asdasd",
+            "imagen": "url",
+            "id": 23
+        }
+    ]
+}
+/////////////////////get all products////
+endPoint: http://localhost:3001/api/products/ 
+GET
+parameters:
+-
+return
+
+{
+    "count": 2,
+    "productos": [
+        {
+            "categorias": "fajas",
+            "nombre": "pepepepep",
+            "precio": 10,
+            "imagen": null,
+            "id": 8
+        },
+        {
+            "categorias": "fajas",
+            "nombre": "producto 1",
+            "precio": null,
+            "imagen": null,
+            "id": 9
+        }
+    ]
+}
+
+you can use ?limit= and ?page= at the end of the endpoint
+
+/////////////////////delete one product////
+
+endPoint: http://localhost:3001/api/products/delete/productId
+PUT
+parameters:
+-
+return:
+"product has been deleted successfully"
+
+/////////////////////////////////orders///////////////////////////////////////////////
+
+
+/////////////////////place new order////
+
+endPoint: http://localhost:3001/api/orders/new
+POST
+parameters:
+
+{
+    "userId": "int",
+    "products": [{"id": "int", "incart": "int" }, {"id":"int", "incart": "int" }, {"id": "int", "incart": "int" }]
+
+
+}
+-
+return:
+{
+    "message": "Order successfully placed with order id 1",
+    "success": true,
+    "pedido_id": 1,
+    "productos": [
+        {
+            "id": 2,
+            "incart": 2
+        },
+        {
+            "id": 8,
+            "incart": 30
+        },
+        {
+            "id": 12,
+            "incart": 10
+        }
+    ]
+}
+
+/////////////////////cancel order////
+
+endPoint: http://localhost:3001/api/orders/cancel/orderId
+PUT
+parameters:
+----
+return:
+{
+    "message": "order canceled successfully",
+    "success": true
+}
+
+/////////////////////get all order////
+
+endpoint: http://localhost:3001/api/orders
+GET
+parameters:
+-
+return:
+[
+    {
+        "id": 2,
+        "nombre": "gelF",
+        "descripcion": "gel especial",
+        "precio": 15,
+        "cantidad": 2,
+        "fecha": "2022-07-31T03:58:24.000Z",
+        "usuario": "leonardo"
+    },
+    {
+        "id": 8,
+        "nombre": "pepepepep",
+        "descripcion": "asdas",
+        "precio": 10,
+        "cantidad": 30,
+        "fecha": "2022-07-31T03:58:24.000Z",
+        "usuario": "leonardo"
+    },
+    {
+        "id": 12,
+        "nombre": "producto 3",
+        "descripcion": "asdas",
+        "precio": null,
+        "cantidad": 10,
+        "fecha": "2022-07-31T03:58:24.000Z",
+        "usuario": "leonardo"
+    }
+]
+
+/////////////////////get all order from one user////
+endpoint: http://localhost:3001/api/orders/user/username
+GET
+parameters:
+-
+return:
+[
+    {
+        "id": 2,
+        "nombre": "gelF",
+        "descripcion": "gel especial",
+        "precio": 15,
+        "cantidad": 2,
+        "fecha": "2022-07-31T03:58:24.000Z",
+        "usuario": "leonardo"
+    },
+    {
+        "id": 8,
+        "nombre": "pepepepep",
+        "descripcion": "asdas",
+        "precio": 10,
+        "cantidad": 30,
+        "fecha": "2022-07-31T03:58:24.000Z",
+        "usuario": "leonardo"
+    },
+    {
+        "id": 12,
+        "nombre": "producto 3",
+        "descripcion": "asdas",
+        "precio": null,
+        "cantidad": 10,
+        "fecha": "2022-07-31T03:58:24.000Z",
+        "usuario": "leonardo"
+    }
+]
+/////////////////////send a email with the last order from one user////
+endPoint: http://localhost:3001/api/orders/userLast/:userId
+GET
+parameters:
+-
+result:
+{
+    "message": "email sended successfuly",
+    "success": true
+}
+
+
+
