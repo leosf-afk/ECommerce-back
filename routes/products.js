@@ -191,20 +191,7 @@ if (cat_idProducto != null && cat_idProducto == value){
 
 
 
-// if (Cat != null && Cat == id_cat.id ){
-                
-//     database.table('productos')
-//     .insert({
-//         cat_id: Cat,
-//         nombre: Nombre,
-//         Descripcion: Descripcion
-//     }).then(
-//         res.json({message: `success`})
-//     )
-// } else{
-//     res.json({message: `please select a category`});
-
-// }                           
+}         
        
 });
 
