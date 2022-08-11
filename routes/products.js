@@ -151,7 +151,6 @@ let id_cat = await database.table('categorias').filter({id : cat_idProducto}).wi
 
 
 
-let id_cat = await database.table('categorias').filter({id : cat}).withFields(['id']).get();
 
 let value;
 
